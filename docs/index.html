@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Blood | LIFESAVE Emergency Network</title>
+    <meta name="description" content="Request emergency blood donations from nearby verified donors within 15km. LIFESAVE connects you with life-savers in real-time.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        crimson: {
+                            400: '#ff5c75',
+                            500: '#ff2a4b',
+                            600: '#e61536',
+                            900: '#8b0015',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+
+        html {
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-color: #050505;
+            font-family: 'Outfit', sans-serif;
+            color: #ffffff;
+        }
+
+        /* ── Background Layers ── */
+        .bg-layer {
+            position: fixed;
+            inset: -20px;
+            z-index: 0;
+            background: url('blood.jpg') center / cover no-repeat;
+            filter: blur(10px) brightness(0.45);
+            pointer-events: none;
+        }
+
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            background: linear-gradient(
+                160deg,
+                rgba(5, 2, 8, 0.96) 0%,
+                rgba(30, 5, 12, 0.90) 40%,
+                rgba(100, 0, 18, 0.75) 100%
+            );
+            pointer-events: none;
+        }
+
+        /* ── Z-Index Hierarchy ── */
+        nav.site-nav       { z-index: 100; }
+        .main-content       { z-index: 10;  position: relative; }
+
+        /* ── Navigation ── */
+        nav.site-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            background: rgba(5, 5, 10, 0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        /* ── Glassmorphism Card ── */
+        .glass-card {
+            background: rgba(20, 18, 28, 0.55);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-top-color: rgba(255, 255, 255, 0.22);
+            border-left-color: rgba(255, 255, 255, 0.16);
+            box-shadow:
+                0 24px 60px rgba(0, 0, 0, 0.45),
+                0 0 40px rgba(230, 21, 54, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            border-radius: 2rem;
+            transition: box-shadow 0.5s ease, transform 0.5s ease;
+        }
+
+        .glass-card:hover {
+            box-shadow:
+                0 28px 70px rgba(0, 0, 0, 0.5),
+                0 0 55px rgba(230, 21, 54, 0.22),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            transform: translateY(-6px);
+        }
+
+        /* ── Float Animation ── */
+        .float-wrapper {
+            animation: float 7s ease-in-out infinite;
+            will-change: transform;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(-10px); }
+        }
+        .float-wrapper:hover { animation-play-state: paused; }
+
+        /* ── Glass Inputs ── */
+        .glass-input {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 1rem;
+            color: #fff;
+            font-size: 1rem;
+            padding: 1rem 1.25rem;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.35s, box-shadow 0.35s, background 0.35s;
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.02);
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 42, 75, 0.55);
+            box-shadow: 0 0 22px rgba(255, 42, 75, 0.25);
+        }
+        .glass-input::placeholder { color: rgba(255,255,255,0.28); }
+        select.glass-input { cursor: pointer; appearance: none; }
+        select.glass-input option { background: #141220; color: #fff; }
+
+        /* ── Labels ── */
+        .field-label {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 900;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #ff5c75;
+            margin-bottom: 0.5rem;
+            padding-left: 0.25rem;
+        }
+
+        /* ── Premium Typography ── */
+        .premium-text {
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+        .title-gradient {
+            background: linear-gradient(to right, #ffffff, #ffb3b3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ── Submit Button ── */
+        .ag-button {
+            background: linear-gradient(135deg, #ff2a4b, #b3001b);
+            border: 1px solid rgba(255, 150, 150, 0.25);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            width: 100%;
+            color: #fff;
+            font-weight: 900;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 28px rgba(255, 42, 75, 0.35);
+            transition: transform 0.35s ease, box-shadow 0.35s ease;
+        }
+        .ag-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 40px rgba(255, 42, 75, 0.55);
+        }
+        .ag-button:active { transform: translateY(1px); }
+        .ag-button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.12) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+        .ag-button:hover::after { transform: translateX(100%); }
+
+        /* ── Donor Cards ── */
+        .donor-card {
+            background: rgba(22, 22, 30, 0.6);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 2px solid rgba(16, 185, 129, 0.5);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2), box-shadow 0.45s ease;
+        }
+        .donor-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #10b981, transparent);
+            transform: translateX(-100%);
+            animation: scan 3s linear infinite;
+        }
+        @keyframes scan { to { transform: translateX(100%); } }
+        .donor-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 18px 45px rgba(16, 185, 129, 0.18);
+        }
+
+        /* ── Status Box ── */
+        #statusBox {
+            position: relative;
+            z-index: 20;
+        }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,42,75,0.4); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,42,75,0.7); }
+
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
+            nav.site-nav { padding: 0.75rem 1rem; }
+            .glass-card  { border-radius: 1.25rem; }
+            .ag-button   { font-size: 0.95rem; padding: 1rem; }
+            .donor-card  { border-radius: 1rem; }
+            .nav-links   { gap: 0.75rem; }
+            .nav-links a { font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- BG Layers -->
+    <div class="bg-layer"></div>
+    <div class="bg-overlay"></div>
+
+    <!-- Navigation -->
+    <nav class="site-nav">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full flex items-center justify-center border border-crimson-500/50" style="background:rgba(255,42,75,0.12); box-shadow:0 0 14px rgba(255,42,75,0.3);">
+                <i class="fa-solid fa-heart-pulse text-crimson-500 text-lg animate-pulse"></i>
+            </div>
+            <span class="text-white font-black text-xl premium-text">LIFESAVE</span>
+        </div>
+        <div class="nav-links flex gap-4 sm:gap-6">
+            <a href="index.html" class="text-white font-bold border-b-2 border-crimson-500 pb-0.5 tracking-wider text-xs sm:text-sm hover:text-crimson-400 transition-colors">Request Blood</a>
+            <a href="register.html" class="text-gray-400 font-medium pb-0.5 tracking-wider text-xs sm:text-sm hover:text-white transition-colors">Become a Donor</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content flex flex-col items-center w-full px-4 sm:px-6 pt-24 sm:pt-28 pb-16">
+
+        <!-- Floating Glass Form Card -->
+        <div class="float-wrapper w-full max-w-3xl mb-10">
+            <div class="glass-card p-6 sm:p-10 md:p-12">
+
+                <!-- Header -->
+                <div class="text-center mb-8 sm:mb-10">
+                    <div class="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-5" style="background:rgba(255,42,75,0.08); border:1px solid rgba(255,42,75,0.25); box-shadow:0 0 30px rgba(230,21,54,0.2);">
+                        <i class="fa-solid fa-truck-medical text-3xl sm:text-4xl text-crimson-500"></i>
+                    </div>
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-black mb-3 title-gradient premium-text">Emergency Request</h1>
+                    <p class="text-gray-400 text-base sm:text-lg font-light tracking-wide max-w-lg mx-auto">Deploying anti-gravity beacons to locate life-savers within 15km.</p>
+                </div>
+
+                <!-- Form -->
+                <form id="requestForm" class="space-y-5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        
+                        <div class="sm:col-span-2">
+                            <label class="field-label">Patient Full Name</label>
+                            <input type="text" name="name" required placeholder="Who needs blood?" class="glass-input">
+                        </div>
+
+                        <div class="relative">
+                            <label class="field-label">Blood Group</label>
+                            <select name="bloodGroup" required class="glass-input font-bold pr-10">
+                                <option value="" disabled selected>Select Group</option>
+                                <option value="A+">A+</option><option value="A-">A-</option>
+                                <option value="B+">B+</option><option value="B-">B-</option>
+                                <option value="O+">O+</option><option value="O-">O-</option>
+                                <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                            </select>
+                            <i class="fa-solid fa-chevron-down text-crimson-500 text-xs absolute right-4 top-[2.6rem] pointer-events-none"></i>
+                        </div>
+
+                        <div>
+                            <label class="field-label">Mobile Number</label>
+                            <input type="tel" name="mobile" required placeholder="Contact Number" class="glass-input">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="field-label">Your Email Address</label>
+                            <input type="email" id="reqEmail" name="email" required placeholder="To receive donor notifications" class="glass-input">
+                        </div>
+
+                        <div>
+                            <label class="field-label">Village / Block</label>
+                            <input type="text" name="village" required placeholder="Current Location" class="glass-input">
+                        </div>
+                        
+                        <div>
+                            <label class="field-label">District</label>
+                            <input type="text" name="district" required placeholder="District Name" class="glass-input">
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="state" value="West Bengal">
+                    <input type="hidden" name="post" value="General">
+
+                    <div class="pt-4">
+                        <button type="submit" id="submitBtn" class="ag-button">
+                            <span id="btnText" class="premium-text">FIND NEARBY DONORS</span>
+                            <i class="fa-solid fa-satellite-dish"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Status Box -->
+                <div id="statusBox" class="hidden mt-6 p-4 rounded-xl text-center font-bold text-sm tracking-wide"></div>
+            </div>
+        </div>
+
+        <!-- Accepted Donors Section -->
+        <div id="acceptedDonorsSection" class="hidden w-full max-w-3xl">
+            <div class="flex items-center gap-4 mb-6 px-1">
+                <div class="w-11 h-11 rounded-full flex items-center justify-center border border-green-500/50 shrink-0" style="background:rgba(16,185,129,0.1); box-shadow:0 0 18px rgba(16,185,129,0.25);">
+                    <i class="fa-solid fa-tower-broadcast text-green-500 text-lg"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-black text-white premium-text">Donors Responding</h2>
+                    <p class="text-[11px] text-green-400 font-bold tracking-widest flex items-center gap-2 mt-0.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse inline-block"></span>
+                        LIVE UPDATES VIA SUPABASE REALTIME
+                    </p>
+                </div>
+            </div>
+            
+            <div id="donorList" class="grid grid-cols-1 sm:grid-cols-2 gap-5 pb-12"></div>
+        </div>
+
+    </main>
+
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- App Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/geocoder.js"></script>
+    <script src="js/request-app.js"></script>
+</body>
+</html>
