@@ -29,7 +29,7 @@
             supabaseClient.removeChannel(realtimeChannel);
         }
 
-        realtimeChannel = supabase
+        realtimeChannel = supabaseClient
             .channel('donor-updates')
             .on(
                 'postgres_changes',
