@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accepting Request | LIFESAVE</title>
+    <meta name="description" content="Donor acceptance page for LIFESAVE Emergency Blood Network.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    colors: {
+                        crimson: { 400: '#ff5c75', 500: '#ff2a4b', 600: '#e61536', 900: '#8b0015' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 0; min-height: 100vh;
+            background-color: #050505;
+            font-family: 'Outfit', sans-serif;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .bg-layer {
+            position: fixed; inset: -20px; z-index: 0;
+            background: url('blood.jpg') center / cover no-repeat;
+            filter: blur(10px) brightness(0.45);
+            pointer-events: none;
+        }
+        .bg-overlay {
+            position: fixed; inset: 0; z-index: 1;
+            background: linear-gradient(160deg, rgba(5,2,8,0.96) 0%, rgba(30,5,12,0.90) 40%, rgba(100,0,18,0.75) 100%);
+            pointer-events: none;
+        }
+        .glass-card {
+            position: relative; z-index: 10;
+            background: rgba(20, 18, 28, 0.55);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-top-color: rgba(255, 255, 255, 0.22);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.45), 0 0 40px rgba(230,21,54,0.12);
+            border-radius: 2rem;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            max-width: 480px;
+            width: 90%;
+        }
+        .spinner {
+            width: 48px; height: 48px;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top-color: #ff2a4b;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .premium-text { letter-spacing: 0.15em; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+    <div class="bg-layer"></div>
+    <div class="bg-overlay"></div>
+
+    <div class="glass-card">
+        <div class="spinner"></div>
+        <h1 class="text-2xl font-black mb-2 premium-text">
+            <i class="fa-solid fa-heart-pulse text-crimson-500 mr-2 animate-pulse"></i>LIFESAVE
+        </h1>
+        <p id="accept-status" class="text-gray-300 text-lg font-light mt-4">
+            Connecting to network...
+        </p>
+    </div>
+
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- App Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/accept-app.js"></script>
+</body>
+</html>

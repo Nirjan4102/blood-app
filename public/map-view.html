@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission: Save a Life | LIFESAVE</title>
+    <meta name="description" content="Navigate to the patient who needs your blood donation. LIFESAVE mission navigation page.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('blood.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+
+    <div class="max-w-4xl w-full glass-card shadow-2xl overflow-hidden animate-render">
+        <div class="bg-red-600 p-6 text-center text-white">
+            <h1 class="text-3xl font-bold uppercase tracking-widest">Request Accepted</h1>
+            <p class="opacity-90">Thank you for your heroic decision!</p>
+        </div>
+
+        <div class="p-8 grid md:grid-cols-2 gap-8">
+            
+            <div class="space-y-4 border-r border-gray-200 pr-4">
+                <h2 class="text-xl font-bold text-gray-800 border-b pb-2">
+                    <i class="fas fa-user-injured text-red-500 mr-2"></i>Patient Details
+                </h2>
+                <div>
+                    <p class="text-sm text-gray-500 uppercase">Name</p>
+                    <p id="patientName" class="text-lg font-semibold text-gray-900">Loading...</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 uppercase">Contact Number</p>
+                    <a id="patientPhoneLink" href="#" class="text-xl font-bold text-red-600 hover:underline">
+                        <i class="fas fa-phone-alt mr-2"></i><span id="patientPhone">...</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h2 class="text-xl font-bold text-gray-800 border-b pb-2">
+                    <i class="fas fa-hand-holding-heart text-green-500 mr-2"></i>Donor Details
+                </h2>
+                <div>
+                    <p class="text-sm text-gray-500 uppercase">Your Registered Name</p>
+                    <p id="donorNameDisplay" class="text-lg font-semibold text-gray-900">Loading...</p>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500 uppercase">Your Mobile</p>
+                    <p id="donorPhoneDisplay" class="text-lg font-semibold text-gray-700">...</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="p-8 bg-gray-50 text-center space-y-4">
+            <p class="text-gray-600">The patient has been notified that you are coming.</p>
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <a id="googleMapsBtn" target="_blank" 
+                   class="bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-bold shadow-lg transition transform hover:scale-105 flex items-center justify-center">
+                    <i class="fas fa-directions mr-2 text-xl"></i> START NAVIGATION
+                </a>
+                <a href="index.html" class="text-gray-500 hover:text-gray-800 flex items-center justify-center">
+                    Return to Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Get data from the URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        const reqName = urlParams.get('reqName');
+        const reqMobile = urlParams.get('reqMobile');
+        const reqLat = urlParams.get('reqLat');
+        const reqLng = urlParams.get('reqLng');
+        const donorName = urlParams.get('donorName');
+        const donorMobile = urlParams.get('donorMobile');
+
+        // 2. Display the Patient Data
+        if (reqName) document.getElementById('patientName').innerText = reqName;
+        if (reqMobile) {
+            document.getElementById('patientPhone').innerText = reqMobile;
+            document.getElementById('patientPhoneLink').href = `tel:${reqMobile}`;
+        }
+
+        // 3. Display the Donor Data
+        if (donorName) document.getElementById('donorNameDisplay').innerText = donorName;
+        if (donorMobile) document.getElementById('donorPhoneDisplay').innerText = donorMobile;
+
+        // 4. Setup Google Maps Navigation
+        if (reqLat && reqLng) {
+            const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${reqLat},${reqLng}&travelmode=driving`;
+            document.getElementById('googleMapsBtn').href = mapsUrl;
+        }
+    </script>
+
+</body>
+</html>

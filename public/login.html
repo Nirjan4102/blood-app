@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donor Login | LIFESAVE Emergency Network</title>
+    <meta name="description" content="Login to your donor profile on LIFESAVE to see active blood requests near you.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    colors: {
+                        crimson: { 400: '#ff5c75', 500: '#ff2a4b', 600: '#e61536', 900: '#8b0015' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 0; min-height: 100vh;
+            background-color: #050505;
+            font-family: 'Outfit', sans-serif;
+            color: #ffffff;
+        }
+        .bg-layer {
+            position: fixed; inset: -20px; z-index: 0;
+            background: url('blood.jpg') center / cover no-repeat;
+            filter: blur(10px) brightness(0.45);
+            pointer-events: none;
+        }
+        .bg-overlay {
+            position: fixed; inset: 0; z-index: 1;
+            background: linear-gradient(160deg, rgba(5, 2, 8, 0.96) 0%, rgba(30, 5, 12, 0.90) 40%, rgba(100, 0, 18, 0.75) 100%);
+            pointer-events: none;
+        }
+        nav.site-nav   { z-index: 100; }
+        .main-content   { z-index: 10; position: relative; }
+
+        nav.site-nav {
+            position: fixed; top: 0; left: 0; right: 0;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1rem 1.5rem;
+            background: rgba(5, 5, 10, 0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .glass-card {
+            background: rgba(20, 18, 28, 0.55);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-top-color: rgba(255, 255, 255, 0.22);
+            border-left-color: rgba(255, 255, 255, 0.16);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), 0 0 40px rgba(230, 21, 54, 0.12);
+            border-radius: 2rem;
+            transition: box-shadow 0.5s ease, transform 0.5s ease;
+        }
+
+        .float-wrapper { animation: float 7s ease-in-out infinite; will-change: transform; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        .glass-input {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 1rem;
+            color: #fff;
+            font-size: 1rem;
+            padding: 1rem 1.25rem;
+            width: 100%;
+            outline: none;
+            transition: all 0.35s;
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 42, 75, 0.55);
+            box-shadow: 0 0 22px rgba(255, 42, 75, 0.25);
+        }
+
+        .field-label {
+            display: block; font-size: 0.65rem; font-weight: 900;
+            letter-spacing: 0.18em; text-transform: uppercase;
+            color: #ff5c75; margin-bottom: 0.5rem; padding-left: 0.25rem;
+        }
+
+        .ag-button {
+            background: linear-gradient(135deg, #ff2a4b, #b3001b);
+            border-radius: 1rem; padding: 1.25rem; width: 100%;
+            color: #fff; font-weight: 900; font-size: 1.1rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.75rem;
+            box-shadow: 0 8px 28px rgba(255, 42, 75, 0.35);
+            transition: all 0.35s ease;
+        }
+        .ag-button:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(255, 42, 75, 0.55); }
+    </style>
+</head>
+<body>
+
+    <div class="bg-layer"></div>
+    <div class="bg-overlay"></div>
+
+    <nav class="site-nav">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full flex items-center justify-center border border-crimson-500/50" style="background:rgba(255,42,75,0.12);">
+                <i class="fa-solid fa-heart-pulse text-crimson-500 text-lg animate-pulse"></i>
+            </div>
+            <span class="text-white font-black text-xl tracking-widest">LIFESAVE</span>
+        </div>
+        <div class="nav-links flex gap-6">
+            <a href="index.html" class="text-gray-400 font-medium text-sm hover:text-white transition-colors">Request Blood</a>
+            <a href="register.html" class="text-gray-400 font-medium text-sm hover:text-white transition-colors">Become a Donor</a>
+        </div>
+    </nav>
+
+    <main class="main-content flex flex-col items-center w-full px-6 pt-32 pb-16">
+        <div class="float-wrapper w-full max-w-md">
+            <div class="glass-card p-10">
+                <div class="text-center mb-10">
+                    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full mb-5" style="background:rgba(255,42,75,0.08); border:1px solid rgba(255,42,75,0.25);">
+                        <i class="fa-solid fa-user-shield text-4xl text-crimson-500"></i>
+                    </div>
+                    <h1 class="text-4xl font-black mb-3 tracking-tight">Donor Login</h1>
+                    <p class="text-gray-400 text-lg font-light">Access your profile and help nearby patients.</p>
+                </div>
+
+                <form id="loginForm" class="space-y-6">
+                    <div>
+                        <label class="field-label">Email Address</label>
+                        <input type="email" name="email" required placeholder="your.email@gmail.com" class="glass-input">
+                    </div>
+                    <div>
+                        <label class="field-label">Mobile Number</label>
+                        <input type="tel" name="mobile" required placeholder="Your phone number" class="glass-input">
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" id="submitBtn" class="ag-button">
+                            <span>LOGIN TO DASHBOARD</span>
+                            <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <div id="message" class="mt-6 hidden">
+                    <div class="p-4 rounded-xl text-center font-bold text-sm tracking-wide" style="background:rgba(255,42,75,0.1); border:1px solid rgba(255,42,75,0.3); color:#ff5c75;">
+                        <p></p>
+                    </div>
+                </div>
+                
+                <p class="mt-8 text-center text-gray-500 text-sm">
+                    New donor? <a href="register.html" class="text-crimson-500 font-bold hover:underline">Register here</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/login-app.js"></script>
+</body>
+</html>
