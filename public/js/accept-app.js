@@ -26,7 +26,7 @@
         statusEl.innerText = 'Processing your acceptance...';
 
         // 1. Update donor's last donation date and get their full info
-        const { data: updatedDonor, error } = await supabase
+        const { data: updatedDonor, error } = await supabaseClient
             .from('donors')
             .update({ last_donation_date: new Date().toISOString() })
             .eq('id', donorId)
@@ -42,7 +42,7 @@
 
         // 2. Optionally notify the requester via Edge Function
         try {
-            await supabase.functions.invoke('notify-requester', {
+            await supabaseClient.functions.invoke('notify-requester', {
                 body: {
                     reqEmail,
                     donorName: updatedDonor.name,

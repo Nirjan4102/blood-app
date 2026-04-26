@@ -26,7 +26,7 @@
 
     function setupRealtimeListener() {
         if (realtimeChannel) {
-            supabase.removeChannel(realtimeChannel);
+            supabaseClient.removeChannel(realtimeChannel);
         }
 
         realtimeChannel = supabase
@@ -122,7 +122,7 @@
             }
 
             // 2. Search for Donors within 15km using PostGIS RPC
-            const { data: donors, error } = await supabase.rpc('find_nearby_donors', {
+            const { data: donors, error } = await supabaseClient.rpc('find_nearby_donors', {
                 search_blood_group: data.bloodGroup.toUpperCase(),
                 search_lng: coords[0],
                 search_lat: coords[1],
@@ -146,7 +146,7 @@
             }
 
             // 3.5. SAVE the request to Supabase so it appears on Donor Dashboards
-            const { error: insertError } = await supabase
+            const { error: insertError } = await supabaseClient
                 .from('requests')
                 .insert({
                     name: data.name,
@@ -190,7 +190,7 @@
                     acceptUrl: `${acceptBaseUrl}?donorId=${donor.id}&reqName=${encodeURIComponent(data.name)}&reqMobile=${data.mobile}&reqLat=${coords[1]}&reqLng=${coords[0]}&reqEmail=${encodeURIComponent(data.email)}`
                 }));
 
-                await supabase.functions.invoke('notify-donors', {
+                await supabaseClient.functions.invoke('notify-donors', {
                     body: {
                         donorsWithUrls,
                         requesterInfo: {

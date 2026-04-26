@@ -34,7 +34,7 @@
             }
 
             // 2. Insert donor into Supabase with PostGIS POINT geometry
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('donors')
                 .insert({
                     name: data.name,

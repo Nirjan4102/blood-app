@@ -27,7 +27,7 @@
 
     try {
         // 1. Fetch Donor Details
-        const { data: donor, error: donorError } = await supabase
+        const { data: donor, error: donorError } = await supabaseClient
             .from('donors')
             .select('*')
             .eq('id', donorId)
@@ -53,7 +53,7 @@
         // we'll fetch pending requests of the SAME blood group.
         // We'll filter by distance in the next iteration or via RPC if possible.
         // For now, let's fetch matching blood group requests.
-        const { data: requests, error: reqError } = await supabase
+        const { data: requests, error: reqError } = await supabaseClient
             .from('requests')
             .select('*')
             .eq('blood_group', donor.blood_group)
@@ -125,10 +125,10 @@
 
         try {
             // Update the request status
-            await supabase.from('requests').update({ status: 'Fulfilled' }).eq('id', reqId);
+            await supabaseClient.from('requests').update({ status: 'Fulfilled' }).eq('id', reqId);
             
             // Update donor's last donation date
-            await supabase.from('donors').update({ last_donation_date: new Date().toISOString() }).eq('id', donorId);
+            await supabaseClient.from('donors').update({ last_donation_date: new Date().toISOString() }).eq('id', donorId);
 
             // Redirect to the accept page which handles the rest (Realtime notification + Map redirect)
             // We use the existing accept.html flow

@@ -20,7 +20,7 @@
 
         try {
             // Query for the donor
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('donors')
                 .select('*')
                 .eq('email', email)
