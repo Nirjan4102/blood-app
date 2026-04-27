@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIFESAVE — System Diagnostics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #0f172a; color: white; font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-3xl font-black mb-8 text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-pink-500">
+            <i class="fa-solid fa-microchip mr-2"></i> System Diagnostics
+        </h1>
+
+        <div class="glass p-6 rounded-2xl mb-6">
+            <h2 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fa-solid fa-server mr-3 text-blue-400"></i> Backend Connection Test
+            </h2>
+            <div id="backend-status" class="p-4 rounded-xl bg-slate-800 border border-slate-700">
+                Checking connection to backend...
+            </div>
+            <p id="backend-url" class="mt-3 text-xs text-slate-400 font-mono"></p>
+        </div>
+
+        <div class="glass p-6 rounded-2xl mb-6">
+            <h2 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fa-solid fa-database mr-3 text-emerald-400"></i> Supabase Connectivity
+            </h2>
+            <div id="supabase-status" class="p-4 rounded-xl bg-slate-800 border border-slate-700">
+                Testing database access...
+            </div>
+        </div>
+
+        <button onclick="runDiagnostics()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl font-bold hover:scale-[1.02] transition-transform shadow-lg shadow-blue-900/20">
+            <i class="fa-solid fa-play mr-2"></i> RUN DIAGNOSTICS
+        </button>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabase = supabase.createClient(LIFESAVE_CONFIG.SUPABASE_URL, LIFESAVE_CONFIG.SUPABASE_ANON_KEY);
+
+        async function runDiagnostics() {
+            const backendBox = document.getElementById('backend-status');
+            const supabaseBox = document.getElementById('supabase-status');
+            const urlText = document.getElementById('backend-url');
+
+            urlText.innerText = `Target URL: ${LIFESAVE_CONFIG.API_URL}`;
+
+            // 1. Test Backend
+            try {
+                const start = Date.now();
+                const res = await fetch(`${LIFESAVE_CONFIG.API_URL}/api/donors/register`, { method: 'OPTIONS' });
+                const end = Date.now();
+                backendBox.innerHTML = `<span class="text-emerald-400 font-bold">✅ CONNECTED</span> (Latency: ${end - start}ms)`;
+                backendBox.style.borderColor = '#10b981';
+            } catch (err) {
+                backendBox.innerHTML = `
+                    <span class="text-red-400 font-bold">❌ CONNECTION FAILED</span><br>
+                    <span class="text-xs text-slate-400 mt-2 block">Reason: ${err.message}</span>
+                    <div class="mt-4 p-3 bg-red-950/30 rounded-lg text-xs text-red-300 border border-red-900/50">
+                        <strong>💡 How to fix:</strong> Your browser cannot reach your backend on Render. 
+                        Make sure your Render service is <strong>LIVE</strong> and the URL in <strong>docs/js/config.js</strong> matches your Render Dashboard URL.
+                    </div>
+                `;
+                backendBox.style.borderColor = '#ef4444';
+            }
+
+            // 2. Test Supabase
+            try {
+                const { data, error } = await supabase.from('donors').select('count', { count: 'exact', head: true });
+                if (error) throw error;
+                supabaseBox.innerHTML = `<span class="text-emerald-400 font-bold">✅ CONNECTED</span><br><span class="text-xs text-slate-400">Found ${data || 0} donors in database.</span>`;
+                supabaseBox.style.borderColor = '#10b981';
+            } catch (err) {
+                supabaseBox.innerHTML = `<span class="text-red-400 font-bold">❌ SUPABASE ERROR</span><br><span class="text-xs text-slate-400">${err.message}</span>`;
+                supabaseBox.style.borderColor = '#ef4444';
+            }
+        }
+
+        window.onload = runDiagnostics;
+    </script>
+</body>
+</html>
