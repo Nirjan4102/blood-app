@@ -33,36 +33,40 @@
                 return;
             }
 
-            // 2. Register via Backend API (to trigger SendGrid email)
-            const response = await fetch(`${LIFESAVE_CONFIG.API_URL}/api/donors/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+            // 2. Save directly to Supabase first (ensure registration works even without backend)
+            const { error: sbError } = await supabaseClient
+                .from('donors')
+                .insert({
                     name: data.name,
                     mobile: data.mobile,
-                    email: data.email,
+                    email: data.email.toLowerCase().trim(),
+                    blood_group: data.bloodGroup.toUpperCase(),
+                    last_donation_date: data.lastDonationDate ? new Date(data.lastDonationDate).toISOString() : null,
                     village: data.village,
                     post: data.post,
                     district: data.district,
                     state: data.state,
-                    bloodGroup: data.bloodGroup,
-                    lastDonationDate: data.lastDonationDate
-                })
-            });
+                    location: `POINT(${coords[0]} ${coords[1]})`
+                });
 
-            const result = await response.json();
-
-            if (!response.ok) {
-                if (result.error && result.error.includes('already registered')) {
+            if (sbError) {
+                if (sbError.code === '23505') {
                     showMessage('This email is already registered.', 'error');
                 } else {
-                    console.error('Registration API error:', result.error);
-                    showMessage(result.error || 'Registration failed. Please try again.', 'error');
+                    console.error('Supabase error:', sbError.message);
+                    showMessage('Registration failed. Please try again.', 'error');
                 }
                 return;
             }
 
-            // 3. Success
+            // 3. Attempt to trigger greeting email via Backend API (Optional)
+            fetch(`${LIFESAVE_CONFIG.API_URL}/api/donors/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).catch(err => console.log('Backend not reached for email notification.'));
+
+            // 4. Success message (always shown if Supabase insert worked)
             showMessage('Registration Successful! You are now part of the LIFESAVE network.', 'success');
             form.reset();
             // Re-set default state value after reset

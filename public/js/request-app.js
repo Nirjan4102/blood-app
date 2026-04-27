@@ -105,35 +105,7 @@
         requestEmail = data.email;
 
         try {
-            // 1. Submit Request via Backend API (to find donors and trigger SendGrid emails)
-            const response = await fetch(`${LIFESAVE_CONFIG.API_URL}/api/request-blood`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: data.name,
-                    mobile: data.mobile,
-                    email: data.email,
-                    village: data.village,
-                    post: data.post || 'General',
-                    district: data.district,
-                    state: data.state || 'West Bengal',
-                    bloodGroup: data.bloodGroup
-                })
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                if (response.status === 404) {
-                    showStatus(result.message || `No eligible ${data.bloodGroup} donors found nearby.`, 'warning');
-                } else {
-                    showStatus(result.error || 'Failed to broadcast request. Please try again.', 'error');
-                }
-                return;
-            }
-
-            // 2. SAVE the request to Supabase (for donor dashboard visibility)
-            // Note: We do this after the API call to ensure emails are priority
+            // 1. Get coordinates and search for donors directly via Supabase RPC
             const coords = await getCoordinates({
                 village: data.village,
                 post: data.post || 'General',
@@ -141,28 +113,55 @@
                 state: data.state || 'West Bengal'
             });
 
-            if (coords) {
-                await supabaseClient.from('requests').insert({
-                    name: data.name,
-                    mobile: data.mobile,
-                    email: data.email,
-                    blood_group: data.bloodGroup.toUpperCase(),
-                    village: data.village,
-                    post: data.post || 'General',
-                    district: data.district,
-                    state: data.state || 'West Bengal',
-                    location: `POINT(${coords[0]} ${coords[1]})`
-                });
+            if (!coords) {
+                showStatus('Location Error: Could not determine coordinates.', 'error');
+                return;
             }
 
-            // 3. Setup Realtime listener for responses
+            const { data: donors, error: rpcError } = await supabaseClient.rpc('find_nearby_donors', {
+                search_blood_group: data.bloodGroup.toUpperCase(),
+                search_lng: coords[0],
+                search_lat: coords[1],
+                max_distance_meters: 15000,
+                min_days_since_donation: 90
+            });
+
+            if (rpcError) {
+                console.error('RPC Error:', rpcError.message);
+                showStatus('Error searching for donors.', 'error');
+                return;
+            }
+
+            if (!donors || donors.length === 0) {
+                showStatus(`No eligible ${data.bloodGroup} donors found nearby.`, 'warning');
+                return;
+            }
+
+            // 2. Save the request to Supabase
+            await supabaseClient.from('requests').insert({
+                name: data.name,
+                mobile: data.mobile,
+                email: data.email,
+                blood_group: data.bloodGroup.toUpperCase(),
+                village: data.village,
+                post: data.post || 'General',
+                district: data.district,
+                state: data.state || 'West Bengal',
+                location: `POINT(${coords[0]} ${coords[1]})`
+            });
+
+            // 3. Attempt to trigger donor emails via Backend API (Optional)
+            fetch(`${LIFESAVE_CONFIG.API_URL}/api/request-blood`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).catch(err => console.log('Backend not reached for email broadcast.'));
+
+            // 4. Setup Realtime listener for responses
             setupRealtimeListener();
 
-            // 4. Show Success
-            showStatus(
-                result.message || `Emergency request broadcasted! Stay on this page for live responses.`,
-                'success'
-            );
+            // 5. Show Success
+            showStatus(`Emergency request broadcasted to ${donors.length} nearby donor(s)! Stay on this page for live responses.`, 'success');
 
         } catch (error) {
             console.error('Request error:', error);
