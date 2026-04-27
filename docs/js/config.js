@@ -12,5 +12,5 @@ const LIFESAVE_CONFIG = {
      * IMPORTANT: Change this to your deployed Render URL (e.g., https://blood-app-backend.onrender.com)
      * If left as localhost, emails will only work when testing on your own machine.
      */
-    API_URL: 'http://localhost:3000', 
+    API_URL: 'https://blood-app-backend.onrender.com', 
 };
