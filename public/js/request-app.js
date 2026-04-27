@@ -105,7 +105,35 @@
         requestEmail = data.email;
 
         try {
-            // 1. Get Patient's Coordinates
+            // 1. Submit Request via Backend API (to find donors and trigger SendGrid emails)
+            const response = await fetch(`${LIFESAVE_CONFIG.API_URL}/api/request-blood`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: data.name,
+                    mobile: data.mobile,
+                    email: data.email,
+                    village: data.village,
+                    post: data.post || 'General',
+                    district: data.district,
+                    state: data.state || 'West Bengal',
+                    bloodGroup: data.bloodGroup
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    showStatus(result.message || `No eligible ${data.bloodGroup} donors found nearby.`, 'warning');
+                } else {
+                    showStatus(result.error || 'Failed to broadcast request. Please try again.', 'error');
+                }
+                return;
+            }
+
+            // 2. SAVE the request to Supabase (for donor dashboard visibility)
+            // Note: We do this after the API call to ensure emails are priority
             const coords = await getCoordinates({
                 village: data.village,
                 post: data.post || 'General',
@@ -113,42 +141,8 @@
                 state: data.state || 'West Bengal'
             });
 
-            if (!coords) {
-                showStatus(
-                    'Location Error: Could not determine coordinates for the request area.',
-                    'error'
-                );
-                return;
-            }
-
-            // 2. Search for Donors within 15km using PostGIS RPC
-            const { data: donors, error } = await supabaseClient.rpc('find_nearby_donors', {
-                search_blood_group: data.bloodGroup.toUpperCase(),
-                search_lng: coords[0],
-                search_lat: coords[1],
-                max_distance_meters: 15000,
-                min_days_since_donation: 90
-            });
-
-            if (error) {
-                console.error('Supabase RPC error:', error.message);
-                showStatus('Internal error while searching for donors.', 'error');
-                return;
-            }
-
-            // 3. Handle no donors found
-            if (!donors || donors.length === 0) {
-                showStatus(
-                    `No eligible ${data.bloodGroup} donors found within 15km of your location.`,
-                    'warning'
-                );
-                return;
-            }
-
-            // 3.5. SAVE the request to Supabase so it appears on Donor Dashboards
-            const { error: insertError } = await supabaseClient
-                .from('requests')
-                .insert({
+            if (coords) {
+                await supabaseClient.from('requests').insert({
                     name: data.name,
                     mobile: data.mobile,
                     email: data.email,
@@ -157,53 +151,18 @@
                     post: data.post || 'General',
                     district: data.district,
                     state: data.state || 'West Bengal',
-                    // PostGIS expects WKT format: POINT(longitude latitude)
                     location: `POINT(${coords[0]} ${coords[1]})`
                 });
-
-            if (insertError) {
-                console.error('Error saving request:', insertError.message);
-                // We continue anyway since finding donors is the primary goal
             }
 
-            // 4. Setup Realtime listener BEFORE showing success
+            // 3. Setup Realtime listener for responses
             setupRealtimeListener();
 
-            // 5. Show the found donors info and accept URLs
-            // Build the base URL for accept links (relative to current site)
-            const baseUrl = window.location.href.replace(/\/[^/]*$/, '');
-            
-            // Display found donors count
+            // 4. Show Success
             showStatus(
-                `Found ${donors.length} nearby ${data.bloodGroup} donor(s)! They have been notified. Stay on this page for live responses.`,
+                result.message || `Emergency request broadcasted! Stay on this page for live responses.`,
                 'success'
             );
-
-            // 6. Try to notify donors via Supabase Edge Function (if deployed)
-            try {
-                const acceptBaseUrl = `${baseUrl}/accept.html`;
-                const donorsWithUrls = donors.map(donor => ({
-                    donor: {
-                        ...donor,
-                        bloodGroup: donor.blood_group
-                    },
-                    acceptUrl: `${acceptBaseUrl}?donorId=${donor.id}&reqName=${encodeURIComponent(data.name)}&reqMobile=${data.mobile}&reqLat=${coords[1]}&reqLng=${coords[0]}&reqEmail=${encodeURIComponent(data.email)}`
-                }));
-
-                await supabaseClient.functions.invoke('notify-donors', {
-                    body: {
-                        donorsWithUrls,
-                        requesterInfo: {
-                            name: data.name,
-                            bloodGroup: data.bloodGroup,
-                            village: data.village
-                        }
-                    }
-                });
-            } catch (fnError) {
-                // Edge Function not deployed — that's okay, the core flow still works
-                console.log('Edge Function not available — email notifications skipped.');
-            }
 
         } catch (error) {
             console.error('Request error:', error);

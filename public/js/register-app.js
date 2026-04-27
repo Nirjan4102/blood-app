@@ -33,32 +33,31 @@
                 return;
             }
 
-            // 2. Insert donor into Supabase with PostGIS POINT geometry
-            const { error } = await supabaseClient
-                .from('donors')
-                .insert({
+            // 2. Register via Backend API (to trigger SendGrid email)
+            const response = await fetch(`${LIFESAVE_CONFIG.API_URL}/api/donors/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
                     name: data.name,
                     mobile: data.mobile,
-                    email: data.email.toLowerCase().trim(),
-                    blood_group: data.bloodGroup.toUpperCase(),
-                    last_donation_date: data.lastDonationDate
-                        ? new Date(data.lastDonationDate).toISOString()
-                        : null,
+                    email: data.email,
                     village: data.village,
                     post: data.post,
                     district: data.district,
                     state: data.state,
-                    // PostGIS expects WKT format: POINT(longitude latitude)
-                    location: `POINT(${coords[0]} ${coords[1]})`
-                });
+                    bloodGroup: data.bloodGroup,
+                    lastDonationDate: data.lastDonationDate
+                })
+            });
 
-            if (error) {
-                // Supabase unique constraint violation code
-                if (error.code === '23505') {
+            const result = await response.json();
+
+            if (!response.ok) {
+                if (result.error && result.error.includes('already registered')) {
                     showMessage('This email is already registered.', 'error');
                 } else {
-                    console.error('Supabase insert error:', error.message);
-                    showMessage('Registration failed. Please try again.', 'error');
+                    console.error('Registration API error:', result.error);
+                    showMessage(result.error || 'Registration failed. Please try again.', 'error');
                 }
                 return;
             }

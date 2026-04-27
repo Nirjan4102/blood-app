@@ -12,6 +12,8 @@ router.post('/request-blood', async (req, res) => {
     try {
         const { name, mobile, email, village, post, district, state, bloodGroup } = req.body;
 
+        const cleanEmail = (email || '').toLowerCase().trim();
+
         // 1. Get Patient's Coordinates
         const coords = await getCoordinates({ village, post, district, state });
 
@@ -22,9 +24,8 @@ router.post('/request-blood', async (req, res) => {
         }
 
         // 2. Search for Donors within 15km using the PostGIS RPC function
-        //    This replaces MongoDB's $near + $maxDistance + 90-day filter
         const { data: donors, error } = await supabase.rpc('find_nearby_donors', {
-            search_blood_group: bloodGroup.toUpperCase(),
+            search_blood_group: (bloodGroup || '').toUpperCase(),
             search_lng: coords[0],
             search_lat: coords[1],
             max_distance_meters: 15000,
@@ -43,20 +44,20 @@ router.post('/request-blood', async (req, res) => {
             });
         }
 
-        // 4. Build per-donor accept URLs (each includes that donor's ID)
-        //    Note: Supabase uses UUID 'id' instead of MongoDB's '_id'
+        // 4. Build per-donor accept URLs
         const baseAcceptUrl = `${process.env.BASE_URL}/api/donors/accept`;
         const donorsWithUrls = donors.map(donor => ({
             donor: {
                 ...donor,
-                // Map Supabase snake_case back to the format mailer.js expects
                 bloodGroup: donor.blood_group
             },
-            acceptUrl: `${baseAcceptUrl}?donorId=${donor.id}&reqName=${encodeURIComponent(name)}&reqMobile=${mobile}&reqLat=${coords[1]}&reqLng=${coords[0]}&reqEmail=${encodeURIComponent(email)}`
+            acceptUrl: `${baseAcceptUrl}?donorId=${donor.id}&reqName=${encodeURIComponent(name)}&reqMobile=${mobile}&reqLat=${coords[1]}&reqLng=${coords[0]}&reqEmail=${encodeURIComponent(cleanEmail)}`
         }));
 
-        // 5. Trigger the emails to all found donors
-        await notifyDonors(donorsWithUrls, { name, bloodGroup, village });
+        // 5. Trigger the emails to all found donors (async)
+        notifyDonors(donorsWithUrls, { name, bloodGroup, village }).catch(err => {
+            console.error('Failed to trigger donor notifications.');
+        });
 
         res.status(200).json({ 
             message: `Emergency request broadcasted! We notified ${donors.length} nearby donor(s).` 

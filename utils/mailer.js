@@ -1,16 +1,34 @@
 const sgMail = require('@sendgrid/mail');
 
 // Load API Key from .env
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const apiKey = process.env.SENDGRID_API_KEY;
+if (apiKey) {
+    sgMail.setApiKey(apiKey);
+} else {
+    console.warn('⚠️ SENDGRID_API_KEY is not set. Emails will not be sent.');
+}
+
+/**
+ * Helper to sanitize email strings
+ */
+const sanitizeEmail = (email) => (email ? email.toLowerCase().trim() : '');
 
 /**
  * Sends a welcome email to a newly registered donor
  */
 const sendGreetingMail = async (toEmail, name) => {
+    const cleanTo = sanitizeEmail(toEmail);
+    const cleanFrom = sanitizeEmail(process.env.EMAIL_FROM);
+
+    if (!cleanTo || !cleanFrom) {
+        console.error('❌ Cannot send greeting email: missing recipient or sender address.');
+        return;
+    }
+
     const msg = {
-        to: toEmail,
+        to: cleanTo,
         from: {
-            email: process.env.EMAIL_FROM,
+            email: cleanFrom,
             name: 'LifeSave Blood Network'
         },
         subject: 'Welcome to the LifeSave Network!',
@@ -26,22 +44,42 @@ const sendGreetingMail = async (toEmail, name) => {
         `
     };
 
-    await sgMail.send(msg);
+    try {
+        await sgMail.send(msg);
+        console.log(`✅ Greeting email sent to ${cleanTo}`);
+    } catch (error) {
+        console.error('❌ SendGrid Error (sendGreetingMail):');
+        if (error.response) {
+            console.error('   Status:', error.response.status);
+            console.error('   Body:', JSON.stringify(error.response.body, null, 2));
+        } else {
+            console.error('   Message:', error.message);
+        }
+        throw error;
+    }
 };
 
 /**
  * Notifies multiple donors about a nearby blood request
- * @param {Array} donorsWithUrls - Array of { donor, acceptUrl }
- * @param {Object} requesterInfo - { name, bloodGroup, village }
  */
 const notifyDonors = async (donorsWithUrls, requesterInfo) => {
     const { name, bloodGroup, village } = requesterInfo;
+    const cleanFrom = sanitizeEmail(process.env.EMAIL_FROM);
+
+    if (!donorsWithUrls || donorsWithUrls.length === 0) {
+        console.log('ℹ️ No donors to notify.');
+        return;
+    }
 
     const emailPromises = donorsWithUrls.map(({ donor, acceptUrl }) => {
+        const cleanTo = sanitizeEmail(donor.email);
+        
+        if (!cleanTo) return Promise.resolve();
+
         const msg = {
-            to: donor.email,
+            to: cleanTo,
             from: {
-                email: process.env.EMAIL_FROM,
+                email: cleanFrom,
                 name: 'URGENT Blood Request'
             },
             subject: `URGENT: ${bloodGroup} Blood Needed in ${village}`,
@@ -61,7 +99,17 @@ const notifyDonors = async (donorsWithUrls, requesterInfo) => {
             `
         };
 
-        return sgMail.send(msg).catch(() => {});
+        return sgMail.send(msg)
+            .then(() => console.log(`✅ Notification email sent to donor: ${cleanTo}`))
+            .catch((error) => {
+                console.error(`❌ SendGrid Error (notifyDonors) for ${cleanTo}:`);
+                if (error.response) {
+                    console.error('   Status:', error.response.status);
+                    console.error('   Body:', JSON.stringify(error.response.body, null, 2));
+                } else {
+                    console.error('   Message:', error.message);
+                }
+            });
     });
 
     await Promise.allSettled(emailPromises);
@@ -71,10 +119,15 @@ const notifyDonors = async (donorsWithUrls, requesterInfo) => {
  * Notifies the patient/requester that a donor is on their way
  */
 const notifyRequester = async (reqEmail, donorName, donorMobile) => {
+    const cleanTo = sanitizeEmail(reqEmail);
+    const cleanFrom = sanitizeEmail(process.env.EMAIL_FROM);
+
+    if (!cleanTo || !cleanFrom) return;
+
     const msg = {
-        to: reqEmail,
+        to: cleanTo,
         from: {
-            email: process.env.EMAIL_FROM,
+            email: cleanFrom,
             name: 'LifeSave Update'
         },
         subject: 'A Donor is Coming!',
@@ -89,7 +142,12 @@ const notifyRequester = async (reqEmail, donorName, donorMobile) => {
         `
     };
 
-    await sgMail.send(msg).catch(() => {});
+    try {
+        await sgMail.send(msg);
+        console.log(`✅ Requester notification email sent to ${cleanTo}`);
+    } catch (error) {
+        console.error('❌ SendGrid Error (notifyRequester):', error.response ? JSON.stringify(error.response.body, null, 2) : error.message);
+    }
 };
 
 module.exports = { sendGreetingMail, notifyDonors, notifyRequester };

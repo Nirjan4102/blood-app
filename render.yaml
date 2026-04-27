@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: blood-app-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: GEOAPIFY_API_KEY
+        sync: false
+      - key: BASE_URL
+        sync: false

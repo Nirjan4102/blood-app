@@ -18,14 +18,16 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ error: "Location not found. Please check your address details." });
         }
 
+        const cleanEmail = (email || '').toLowerCase().trim();
+
         // Insert donor into Supabase with PostGIS POINT geometry
         const { data, error } = await supabase
             .from('donors')
             .insert({
                 name,
                 mobile,
-                email: email.toLowerCase().trim(),
-                blood_group: bloodGroup.toUpperCase(),
+                email: cleanEmail,
+                blood_group: (bloodGroup || '').toUpperCase(),
                 last_donation_date: lastDonationDate ? new Date(lastDonationDate).toISOString() : null,
                 village,
                 post,
@@ -45,7 +47,10 @@ router.post('/register', async (req, res) => {
             return res.status(500).json({ error: "Server Error" });
         }
 
-        await sendGreetingMail(email, name).catch(() => {});
+        // Send greeting mail (async, don't block response)
+        sendGreetingMail(cleanEmail, name).catch(err => {
+            console.error('Failed to send greeting email after registration.');
+        });
 
         res.status(201).json({ message: "Registration successful!" });
 
@@ -91,10 +96,11 @@ router.get('/accept', async (req, res) => {
         }
 
         // 4. Send the automated email notification to the requester as a backup
-        await notifyRequester(reqEmail, updatedDonor.name, updatedDonor.mobile);
+        notifyRequester(reqEmail, updatedDonor.name, updatedDonor.mobile).catch(() => {});
 
-        // 5. Redirect the donor to the Map View (unchanged)
-        const redirectUrl = `/map-view.html?` + 
+        // 5. Redirect the donor to the Map View on the FRONTEND
+        const frontendUrl = process.env.BASE_URL || '';
+        const redirectUrl = `${frontendUrl}/map-view.html?` + 
             `reqName=${encodeURIComponent(reqName)}` +
             `&reqMobile=${reqMobile}` +
             `&reqLat=${reqLat}` +
