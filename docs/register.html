@@ -277,33 +277,34 @@
 
         /* ── Refined Glassmorphism ── */
         .glass-card {
-            background: rgba(10, 20, 15, 0.75) !important;
-            backdrop-filter: blur(16px) !important;
-            -webkit-backdrop-filter: blur(16px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
-            border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
-            border-left: 1px solid rgba(255, 255, 255, 0.15) !important;
+            background: rgba(30, 41, 59, 0.7) !important; /* Lighter slate-blue/green glass */
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
+            border-left: 1px solid rgba(255, 255, 255, 0.3) !important;
             box-shadow: 
-                0 30px 60px rgba(0, 0, 0, 0.6), 
-                inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
-            
-            animation: none !important; /* Remove old float animation to prevent conflict with tilt */
+                0 20px 40px rgba(0, 0, 0, 0.5), 
+                0 0 40px rgba(16, 185, 129, 0.1) !important;
+            animation: none !important;
         }
-        
-        /* Stop the wrapper float animation as well to avoid jitter with vanilla-tilt */
+
         .float-wrapper {
             animation: none !important;
         }
 
         /* ── Input Polish ── */
         .glass-input {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            background: rgba(255, 255, 255, 0.03);
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1) !important; /* Brighter input background */
+            border: 1px solid rgba(255, 255, 255, 0.3) !important; /* Brighter border */
+            color: #ffffff !important;
         }
+        .glass-input::placeholder { color: rgba(255, 255, 255, 0.6) !important; }
         .glass-input:focus {
-            background: rgba(16, 185, 129, 0.08);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15);
+            background: rgba(255, 255, 255, 0.15) !important;
+            border-color: rgba(52, 211, 153, 0.8) !important;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4) !important;
         }
 
         /* ── Button Glow Hover ── */
@@ -311,23 +312,14 @@
             overflow: hidden;
             position: relative;
             z-index: 1;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .ag-button::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
-            transform: translateX(-100%);
-            transition: 0.6s ease;
-            z-index: -1;
-        }
-        .ag-button:hover::before {
-            transform: translateX(100%);
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #10b981, #059669) !important;
+            border: 1px solid rgba(16, 185, 129, 0.5) !important;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4) !important;
         }
         .ag-button:hover {
-            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
-            transform: scale(1.02);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.6) !important;
+            transform: translateY(-2px) !important;
         }
 
     </style>
@@ -501,19 +493,12 @@
 
         // Initialize GSAP Animations
         document.addEventListener("DOMContentLoaded", () => {
-            gsap.from("nav.site-nav", { y: -50, opacity: 0, duration: 1, ease: "power3.out" });
-            gsap.from(".glass-card", { y: 40, opacity: 0, duration: 1, delay: 0.2, ease: "power3.out" });
+            // gsap removed for visibility
+            // gsap removed for visibility
             
             const inputs = document.querySelectorAll('.glass-input, .ag-button, .feature-badge, .nav-links a');
             if(inputs.length > 0) {
-                gsap.from(inputs, { 
-                    y: 15, 
-                    opacity: 0, 
-                    duration: 0.6, 
-                    stagger: 0.05, 
-                    delay: 0.5, 
-                    ease: "power2.out" 
-                });
+                // gsap removed for visibility
             }
         });
     </script>
