@@ -15,7 +15,7 @@
                 extend: {
                     fontFamily: { sans: ['Outfit', 'sans-serif'] },
                     colors: {
-                        crimson: { 400: '#ff5c75', 500: '#ff2a4b', 600: '#e61536', 900: '#8b0015' }
+                        emerald: { 400: '#34d399', 500: '#10b981', 600: '#059669', 900: '#064e3b' }
                     }
                 }
             }
@@ -61,7 +61,7 @@
         .request-card {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-left: 4px solid #ff2a4b;
+            border-left: 4px solid #10b981;
             border-radius: 1rem;
             transition: all 0.3s ease;
         }
@@ -74,27 +74,92 @@
             animation: pulse-red 2s infinite;
         }
         @keyframes pulse-red {
-            0% { box-shadow: 0 0 0 0 rgba(255, 42, 75, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 42, 75, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 42, 75, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
+    
+        /* ── Particles BG ── */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #050505 0%, #064e3b 100%);
+            z-index: 0;
+            top: 0; left: 0;
+        }
+
+        /* ── Refined Glassmorphism ── */
+        .glass-card {
+            background: rgba(20, 25, 22, 0.65) !important;
+            backdrop-filter: blur(32px) !important;
+            -webkit-backdrop-filter: blur(32px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-left: 1px solid rgba(255, 255, 255, 0.15) !important;
+            box-shadow: 
+                0 30px 60px rgba(0, 0, 0, 0.6), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+            transform-style: preserve-3d;
+            animation: none !important; /* Remove old float animation to prevent conflict with tilt */
+        }
+        
+        /* Stop the wrapper float animation as well to avoid jitter with vanilla-tilt */
+        .float-wrapper {
+            animation: none !important;
+        }
+
+        /* ── Input Polish ── */
+        .glass-input {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .glass-input:focus {
+            background: rgba(16, 185, 129, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15);
+        }
+
+        /* ── Button Glow Hover ── */
+        .ag-button {
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .ag-button::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: translateX(-100%);
+            transition: 0.6s ease;
+            z-index: -1;
+        }
+        .ag-button:hover::before {
+            transform: translateX(100%);
+        }
+        .ag-button:hover {
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+            transform: scale(1.02);
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="bg-layer"></div>
-    <div class="bg-overlay"></div>
+    <div id="particles-js"></div>
 
     <nav class="site-nav">
         <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full flex items-center justify-center border border-crimson-500/50" style="background:rgba(255,42,75,0.12);">
-                <i class="fa-solid fa-heart-pulse text-crimson-500 text-lg animate-pulse"></i>
+            <div class="w-9 h-9 rounded-full flex items-center justify-center border border-emerald-500/50" style="background:rgba(16, 185, 129,0.12);">
+                <i class="fa-solid fa-heart-pulse text-emerald-500 text-lg animate-pulse"></i>
             </div>
             <span class="text-white font-black text-xl tracking-widest">LIFESAVE</span>
         </div>
         <div class="flex items-center gap-6">
             <span id="welcomeName" class="text-gray-300 font-medium hidden sm:inline">Welcome, Donor</span>
-            <button id="logoutBtn" class="text-crimson-400 hover:text-crimson-300 font-bold text-sm transition-colors">
+            <button id="logoutBtn" class="text-emerald-400 hover:text-emerald-300 font-bold text-sm transition-colors">
                 <i class="fa-solid fa-power-off mr-1"></i> LOGOUT
             </button>
         </div>
@@ -104,10 +169,10 @@
         
         <!-- Dashboard Header -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div class="glass-card p-6 md:col-span-2">
+            <div class="glass-card p-6 md:col-span-2" data-tilt data-tilt-max="4" data-tilt-glare data-tilt-max-glare="0.1">
                 <div class="flex items-center gap-4 mb-6">
-                    <div class="w-14 h-14 rounded-full bg-crimson-500/10 border border-crimson-500/30 flex items-center justify-center">
-                        <i class="fa-solid fa-id-card text-2xl text-crimson-500"></i>
+                    <div class="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
+                        <i class="fa-solid fa-id-card text-2xl text-emerald-500"></i>
                     </div>
                     <div>
                         <h1 class="text-2xl font-black">Donor Profile</h1>
@@ -117,25 +182,25 @@
                 
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-6" id="profileDetails">
                     <div class="space-y-1">
-                        <p class="text-[10px] font-black text-crimson-500 tracking-widest uppercase">Blood Group</p>
+                        <p class="text-[10px] font-black text-emerald-500 tracking-widest uppercase">Blood Group</p>
                         <p id="profileBlood" class="text-xl font-bold">--</p>
                     </div>
                     <div class="space-y-1">
-                        <p class="text-[10px] font-black text-crimson-500 tracking-widest uppercase">Location</p>
+                        <p class="text-[10px] font-black text-emerald-500 tracking-widest uppercase">Location</p>
                         <p id="profileLocation" class="text-xl font-bold">--</p>
                     </div>
                     <div class="space-y-1">
-                        <p class="text-[10px] font-black text-crimson-500 tracking-widest uppercase">Total Saved</p>
+                        <p class="text-[10px] font-black text-emerald-500 tracking-widest uppercase">Total Saved</p>
                         <p class="text-xl font-bold">0</p>
                     </div>
                     <div class="space-y-1">
-                        <p class="text-[10px] font-black text-crimson-500 tracking-widest uppercase">Last Donated</p>
+                        <p class="text-[10px] font-black text-emerald-500 tracking-widest uppercase">Last Donated</p>
                         <p id="profileLastDonation" class="text-xl font-bold">--</p>
                     </div>
                 </div>
             </div>
 
-            <div class="glass-card p-6 flex flex-col justify-center items-center text-center">
+            <div class="glass-card p-6 flex flex-col justify-center items-center text-center" data-tilt data-tilt-max="4" data-tilt-glare data-tilt-max-glare="0.1">
                 <div class="w-16 h-16 rounded-full bg-green-500/10 border border-green-500/30 flex items-center justify-center mb-4">
                     <i class="fa-solid fa-shield-check text-3xl text-green-500"></i>
                 </div>
@@ -147,17 +212,17 @@
         <!-- Active Requests Section -->
         <div class="mb-6 flex items-center justify-between">
             <h2 class="text-2xl font-black tracking-tight">
-                <i class="fa-solid fa-satellite-dish mr-2 text-crimson-500"></i>
+                <i class="fa-solid fa-satellite-dish mr-2 text-emerald-500"></i>
                 Active Requests Nearby
             </h2>
-            <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-crimson-500/10 border border-crimson-500/30 text-[10px] font-black text-crimson-500 pulse-red">
+            <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-black text-emerald-500 pulse-red">
                 LIVE UPDATES
             </div>
         </div>
 
         <div id="requestList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Shimmer/Loading -->
-            <div class="glass-card p-6 animate-pulse">
+            <div class="glass-card p-6 animate-pulse" data-tilt data-tilt-max="4" data-tilt-glare data-tilt-max-glare="0.1">
                 <div class="h-4 bg-gray-700 rounded w-3/4 mb-4"></div>
                 <div class="h-10 bg-gray-700 rounded mb-4"></div>
                 <div class="h-4 bg-gray-700 rounded w-1/2"></div>
@@ -180,5 +245,54 @@
     <script src="js/config.js?v=2"></script>
     <script src="js/supabase-client.js?v=2"></script>
     <script src="js/dashboard-app.js?v=2"></script>
+
+    <!-- GSAP for Smooth Entrance -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <!-- Vanilla Tilt -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+    
+    <script>
+        // Initialize Particles
+        if(document.getElementById('particles-js')) {
+            particlesJS("particles-js", {
+                "particles": {
+                    "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                    "color": { "value": "#10b981" },
+                    "shape": { "type": "circle" },
+                    "opacity": { "value": 0.4, "random": true },
+                    "size": { "value": 3, "random": true },
+                    "line_linked": { "enable": true, "distance": 150, "color": "#10b981", "opacity": 0.25, "width": 1 },
+                    "move": { "enable": true, "speed": 1.5, "direction": "none", "random": true, "out_mode": "out" }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                    "modes": { "grab": { "distance": 160, "line_linked": { "opacity": 0.5 } }, "push": { "particles_nb": 3 } }
+                },
+                "retina_detect": true
+            });
+        }
+
+        // Initialize GSAP Animations
+        document.addEventListener("DOMContentLoaded", () => {
+            gsap.from("nav.site-nav", { y: -50, opacity: 0, duration: 1, ease: "power3.out" });
+            gsap.from(".glass-card", { y: 40, opacity: 0, duration: 1, delay: 0.2, ease: "power3.out" });
+            
+            const inputs = document.querySelectorAll('.glass-input, .ag-button, .feature-badge, .nav-links a');
+            if(inputs.length > 0) {
+                gsap.from(inputs, { 
+                    y: 15, 
+                    opacity: 0, 
+                    duration: 0.6, 
+                    stagger: 0.05, 
+                    delay: 0.5, 
+                    ease: "power2.out" 
+                });
+            }
+        });
+    </script>
+
 </body>
 </html>

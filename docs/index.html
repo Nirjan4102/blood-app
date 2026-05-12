@@ -18,11 +18,11 @@
                         sans: ['Outfit', 'sans-serif'],
                     },
                     colors: {
-                        crimson: {
-                            400: '#ff5c75',
-                            500: '#ff2a4b',
-                            600: '#e61536',
-                            900: '#8b0015',
+                        emerald: {
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                            900: '#064e3b',
                         }
                     }
                 }
@@ -99,7 +99,7 @@
             border-left-color: rgba(255, 255, 255, 0.16);
             box-shadow:
                 0 24px 60px rgba(0, 0, 0, 0.45),
-                0 0 40px rgba(230, 21, 54, 0.12),
+                0 0 40px rgba(5, 150, 105, 0.12),
                 inset 0 1px 0 rgba(255, 255, 255, 0.06);
             border-radius: 2rem;
             transition: box-shadow 0.5s ease, transform 0.5s ease;
@@ -108,7 +108,7 @@
         .glass-card:hover {
             box-shadow:
                 0 28px 70px rgba(0, 0, 0, 0.5),
-                0 0 55px rgba(230, 21, 54, 0.22),
+                0 0 55px rgba(5, 150, 105, 0.22),
                 inset 0 1px 0 rgba(255, 255, 255, 0.08);
             transform: translateY(-6px);
         }
@@ -139,8 +139,8 @@
         }
         .glass-input:focus {
             background: rgba(255, 255, 255, 0.07);
-            border-color: rgba(255, 42, 75, 0.55);
-            box-shadow: 0 0 22px rgba(255, 42, 75, 0.25);
+            border-color: rgba(16, 185, 129, 0.55);
+            box-shadow: 0 0 22px rgba(16, 185, 129, 0.25);
         }
         .glass-input::placeholder { color: rgba(255,255,255,0.28); }
         select.glass-input { cursor: pointer; appearance: none; }
@@ -153,7 +153,7 @@
             font-weight: 900;
             letter-spacing: 0.18em;
             text-transform: uppercase;
-            color: #ff5c75;
+            color: #34d399;
             margin-bottom: 0.5rem;
             padding-left: 0.25rem;
         }
@@ -164,7 +164,7 @@
             text-transform: uppercase;
         }
         .title-gradient {
-            background: linear-gradient(to right, #ffffff, #ffb3b3);
+            background: linear-gradient(to right, #ffffff, #a7f3d0);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -172,8 +172,8 @@
 
         /* ── Submit Button ── */
         .ag-button {
-            background: linear-gradient(135deg, #ff2a4b, #b3001b);
-            border: 1px solid rgba(255, 150, 150, 0.25);
+            background: linear-gradient(135deg, #10b981, #047857);
+            border: 1px solid rgba(110, 231, 183, 0.25);
             border-radius: 1rem;
             padding: 1.25rem;
             width: 100%;
@@ -187,12 +187,12 @@
             gap: 0.75rem;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 8px 28px rgba(255, 42, 75, 0.35);
+            box-shadow: 0 8px 28px rgba(16, 185, 129, 0.35);
             transition: transform 0.35s ease, box-shadow 0.35s ease;
         }
         .ag-button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 14px 40px rgba(255, 42, 75, 0.55);
+            box-shadow: 0 14px 40px rgba(16, 185, 129, 0.55);
         }
         .ag-button:active { transform: translateY(1px); }
         .ag-button::after {
@@ -242,8 +242,8 @@
         /* ── Scrollbar ── */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,42,75,0.4); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,42,75,0.7); }
+        ::-webkit-scrollbar-thumb { background: rgba(16, 185, 129,0.4); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(16, 185, 129,0.7); }
 
         /* ── Responsive ── */
         @media (max-width: 640px) {
@@ -254,24 +254,89 @@
             .nav-links   { gap: 0.75rem; }
             .nav-links a { font-size: 0.7rem; }
         }
+    
+        /* ── Particles BG ── */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #050505 0%, #064e3b 100%);
+            z-index: 0;
+            top: 0; left: 0;
+        }
+
+        /* ── Refined Glassmorphism ── */
+        .glass-card {
+            background: rgba(20, 25, 22, 0.65) !important;
+            backdrop-filter: blur(32px) !important;
+            -webkit-backdrop-filter: blur(32px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+            border-left: 1px solid rgba(255, 255, 255, 0.15) !important;
+            box-shadow: 
+                0 30px 60px rgba(0, 0, 0, 0.6), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+            transform-style: preserve-3d;
+            animation: none !important; /* Remove old float animation to prevent conflict with tilt */
+        }
+        
+        /* Stop the wrapper float animation as well to avoid jitter with vanilla-tilt */
+        .float-wrapper {
+            animation: none !important;
+        }
+
+        /* ── Input Polish ── */
+        .glass-input {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .glass-input:focus {
+            background: rgba(16, 185, 129, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.15);
+        }
+
+        /* ── Button Glow Hover ── */
+        .ag-button {
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .ag-button::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: translateX(-100%);
+            transition: 0.6s ease;
+            z-index: -1;
+        }
+        .ag-button:hover::before {
+            transform: translateX(100%);
+        }
+        .ag-button:hover {
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+            transform: scale(1.02);
+        }
+
     </style>
 </head>
 <body>
 
     <!-- BG Layers -->
-    <div class="bg-layer"></div>
-    <div class="bg-overlay"></div>
+    <div id="particles-js"></div>
 
     <!-- Navigation -->
     <nav class="site-nav">
         <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-full flex items-center justify-center border border-crimson-500/50" style="background:rgba(255,42,75,0.12); box-shadow:0 0 14px rgba(255,42,75,0.3);">
-                <i class="fa-solid fa-heart-pulse text-crimson-500 text-lg animate-pulse"></i>
+            <div class="w-9 h-9 rounded-full flex items-center justify-center border border-emerald-500/50" style="background:rgba(16, 185, 129,0.12); box-shadow:0 0 14px rgba(16, 185, 129,0.3);">
+                <i class="fa-solid fa-heart-pulse text-emerald-500 text-lg animate-pulse"></i>
             </div>
             <span class="text-white font-black text-xl premium-text">LIFESAVE</span>
         </div>
         <div class="nav-links flex gap-4 sm:gap-6">
-            <a href="index.html" class="text-white font-bold border-b-2 border-crimson-500 pb-0.5 tracking-wider text-xs sm:text-sm hover:text-crimson-400 transition-colors">Request Blood</a>
+            <a href="index.html" class="text-white font-bold border-b-2 border-emerald-500 pb-0.5 tracking-wider text-xs sm:text-sm hover:text-emerald-400 transition-colors">Request Blood</a>
             <a href="register.html" class="text-gray-400 font-medium pb-0.5 tracking-wider text-xs sm:text-sm hover:text-white transition-colors">Become a Donor</a>
             <a href="login.html" class="text-gray-400 font-medium pb-0.5 tracking-wider text-xs sm:text-sm hover:text-white transition-colors">Donor Login</a>
         </div>
@@ -282,12 +347,12 @@
 
         <!-- Floating Glass Form Card -->
         <div class="float-wrapper w-full max-w-3xl mb-10">
-            <div class="glass-card p-6 sm:p-10 md:p-12">
+            <div class="glass-card p-6 sm:p-10 md:p-12" data-tilt data-tilt-max="4" data-tilt-glare data-tilt-max-glare="0.1">
 
                 <!-- Header -->
                 <div class="text-center mb-8 sm:mb-10">
-                    <div class="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-5" style="background:rgba(255,42,75,0.08); border:1px solid rgba(255,42,75,0.25); box-shadow:0 0 30px rgba(230,21,54,0.2);">
-                        <i class="fa-solid fa-truck-medical text-3xl sm:text-4xl text-crimson-500"></i>
+                    <div class="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full mb-5" style="background:rgba(16, 185, 129,0.08); border:1px solid rgba(16, 185, 129,0.25); box-shadow:0 0 30px rgba(5, 150, 105,0.2);">
+                        <i class="fa-solid fa-truck-medical text-3xl sm:text-4xl text-emerald-500"></i>
                     </div>
                     <h1 class="text-3xl sm:text-4xl md:text-5xl font-black mb-3 title-gradient premium-text">Emergency Request</h1>
                     <p class="text-gray-400 text-base sm:text-lg font-light tracking-wide max-w-lg mx-auto">Deploying anti-gravity beacons to locate life-savers within 15km.</p>
@@ -311,7 +376,7 @@
                                 <option value="O+">O+</option><option value="O-">O-</option>
                                 <option value="AB+">AB+</option><option value="AB-">AB-</option>
                             </select>
-                            <i class="fa-solid fa-chevron-down text-crimson-500 text-xs absolute right-4 top-[2.6rem] pointer-events-none"></i>
+                            <i class="fa-solid fa-chevron-down text-emerald-500 text-xs absolute right-4 top-[2.6rem] pointer-events-none"></i>
                         </div>
 
                         <div>
@@ -378,5 +443,54 @@
     <script src="js/supabase-client.js?v=2"></script>
     <script src="js/geocoder.js?v=2"></script>
     <script src="js/request-app.js?v=2"></script>
+
+    <!-- GSAP for Smooth Entrance -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <!-- Vanilla Tilt -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+    
+    <script>
+        // Initialize Particles
+        if(document.getElementById('particles-js')) {
+            particlesJS("particles-js", {
+                "particles": {
+                    "number": { "value": 60, "density": { "enable": true, "value_area": 800 } },
+                    "color": { "value": "#10b981" },
+                    "shape": { "type": "circle" },
+                    "opacity": { "value": 0.4, "random": true },
+                    "size": { "value": 3, "random": true },
+                    "line_linked": { "enable": true, "distance": 150, "color": "#10b981", "opacity": 0.25, "width": 1 },
+                    "move": { "enable": true, "speed": 1.5, "direction": "none", "random": true, "out_mode": "out" }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": { "onhover": { "enable": true, "mode": "grab" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
+                    "modes": { "grab": { "distance": 160, "line_linked": { "opacity": 0.5 } }, "push": { "particles_nb": 3 } }
+                },
+                "retina_detect": true
+            });
+        }
+
+        // Initialize GSAP Animations
+        document.addEventListener("DOMContentLoaded", () => {
+            gsap.from("nav.site-nav", { y: -50, opacity: 0, duration: 1, ease: "power3.out" });
+            gsap.from(".glass-card", { y: 40, opacity: 0, duration: 1, delay: 0.2, ease: "power3.out" });
+            
+            const inputs = document.querySelectorAll('.glass-input, .ag-button, .feature-badge, .nav-links a');
+            if(inputs.length > 0) {
+                gsap.from(inputs, { 
+                    y: 15, 
+                    opacity: 0, 
+                    duration: 0.6, 
+                    stagger: 0.05, 
+                    delay: 0.5, 
+                    ease: "power2.out" 
+                });
+            }
+        });
+    </script>
+
 </body>
 </html>

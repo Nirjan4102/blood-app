@@ -92,14 +92,14 @@
                         <h4 class="text-lg font-bold text-white">${req.name}</h4>
                         <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">${req.village}, ${req.district}</p>
                     </div>
-                    <div class="px-2 py-1 rounded bg-crimson-500/10 border border-crimson-500/30 text-[10px] font-black text-crimson-500">
+                    <div class="px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/30 text-[10px] font-black text-emerald-500">
                         ${timeLabel}
                     </div>
                 </div>
                 
                 <div class="space-y-2 mb-6 flex-grow">
                     <div class="flex items-center gap-2 text-sm text-gray-300">
-                        <i class="fa-solid fa-droplet text-crimson-500 w-4"></i>
+                        <i class="fa-solid fa-droplet text-emerald-500 w-4"></i>
                         <span>Needs <strong>${req.blood_group}</strong> Blood</span>
                     </div>
                     <div class="flex items-center gap-2 text-sm text-gray-300">
@@ -109,7 +109,7 @@
                 </div>
 
                 <button onclick="acceptRequest('${req.id}', '${req.name}', '${req.mobile}', '${req.email}')" 
-                        class="w-full py-3 rounded-lg bg-crimson-600 hover:bg-crimson-500 text-white font-black text-xs tracking-widest transition-all">
+                        class="w-full py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs tracking-widest transition-all">
                     ACCEPT & VIEW CONTACT
                 </button>
             `;

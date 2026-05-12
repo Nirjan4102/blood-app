@@ -73,7 +73,7 @@
                         <p class="text-[10px] text-green-400 font-bold premium-text mt-1">Response Confirmed</p>
                     </div>
                     <div class="flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black premium-text" style="background:rgba(255,42,75,0.12);border:1px solid rgba(255,42,75,0.35);color:#ff5c75;">
-                        <span class="w-1.5 h-1.5 rounded-full bg-crimson-500 animate-pulse inline-block"></span> LIVE
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse inline-block"></span> LIVE
                     </div>
                 </div>
                 <div class="space-y-2 mb-6 flex-grow">
