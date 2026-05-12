@@ -267,16 +267,16 @@
 
         /* ── Refined Glassmorphism ── */
         .glass-card {
-            background: rgba(20, 25, 22, 0.65) !important;
-            backdrop-filter: blur(32px) !important;
-            -webkit-backdrop-filter: blur(32px) !important;
+            background: rgba(10, 20, 15, 0.75) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
             border: 1px solid rgba(255, 255, 255, 0.08) !important;
             border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
             border-left: 1px solid rgba(255, 255, 255, 0.15) !important;
             box-shadow: 
                 0 30px 60px rgba(0, 0, 0, 0.6), 
                 inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
-            transform-style: preserve-3d;
+            
             animation: none !important; /* Remove old float animation to prevent conflict with tilt */
         }
         
@@ -347,7 +347,7 @@
 
         <!-- Floating Glass Form Card -->
         <div class="float-wrapper w-full max-w-3xl mb-10">
-            <div class="glass-card p-6 sm:p-10 md:p-12" data-tilt data-tilt-max="4" data-tilt-glare data-tilt-max-glare="0.1">
+            <div class="glass-card p-6 sm:p-10 md:p-12"   -glare >
 
                 <!-- Header -->
                 <div class="text-center mb-8 sm:mb-10">
@@ -449,7 +449,7 @@
     <!-- Particles.js -->
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <!-- Vanilla Tilt -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+    
     
     <script>
         // Initialize Particles

@@ -115,16 +115,16 @@
 
         /* ── Refined Glassmorphism ── */
         .glass-card {
-            background: rgba(20, 25, 22, 0.65) !important;
-            backdrop-filter: blur(32px) !important;
-            -webkit-backdrop-filter: blur(32px) !important;
+            background: rgba(10, 20, 15, 0.75) !important;
+            backdrop-filter: blur(16px) !important;
+            -webkit-backdrop-filter: blur(16px) !important;
             border: 1px solid rgba(255, 255, 255, 0.08) !important;
             border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
             border-left: 1px solid rgba(255, 255, 255, 0.15) !important;
             box-shadow: 
                 0 30px 60px rgba(0, 0, 0, 0.6), 
                 inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
-            transform-style: preserve-3d;
+            
             animation: none !important; /* Remove old float animation to prevent conflict with tilt */
         }
         
@@ -189,7 +189,7 @@
 
     <main class="main-content flex flex-col items-center w-full px-6 pt-32 pb-16">
         <div class="float-wrapper w-full max-w-md">
-            <div class="glass-card p-10" data-tilt data-tilt-max="4" data-tilt-glare data-tilt-max-glare="0.1">
+            <div class="glass-card p-10"   -glare >
                 <div class="text-center mb-10">
                     <div class="inline-flex items-center justify-center w-20 h-20 rounded-full mb-5" style="background:rgba(16, 185, 129,0.08); border:1px solid rgba(16, 185, 129,0.25);">
                         <i class="fa-solid fa-user-shield text-4xl text-emerald-500"></i>
@@ -240,7 +240,7 @@
     <!-- Particles.js -->
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <!-- Vanilla Tilt -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+    
     
     <script>
         // Initialize Particles
