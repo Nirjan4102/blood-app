@@ -151,7 +151,7 @@
             });
 
             // 3. Send notification emails to each donor via pg_net RPC
-            const baseAcceptUrl = `${window.location.origin}${window.location.pathname.replace(/\\/[^/]*$/, '')}/accept.html`;
+            const baseAcceptUrl = `${window.location.origin}${window.location.pathname.replace(/\/[^/]*$/, '')}/accept.html`;
             const cleanEmail = (data.email || '').toLowerCase().trim();
 
             donors.forEach(donor => {
