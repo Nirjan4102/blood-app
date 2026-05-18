@@ -59,12 +59,33 @@
                 return;
             }
 
-            // 3. Attempt to trigger greeting email via Backend API (Optional)
-            fetch(`${LIFESAVE_CONFIG.API_URL}/api/donors/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            }).catch(err => console.log('Backend not reached for email notification.'));
+            // 3. Send welcome email via pg_net RPC Function
+            const htmlContent = `
+                <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0a1628; border-radius: 16px; overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, #10b981, #059669); padding: 30px; text-align: center;">
+                        <h1 style="color: white; margin: 0; font-size: 28px;">🩸 LifeSave Network</h1>
+                        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">Blood Donation Platform</p>
+                    </div>
+                    <div style="padding: 30px; color: #e2e8f0;">
+                        <h2 style="color: #34d399; margin-top: 0;">Welcome, ${data.name}! 🎉</h2>
+                        <p style="line-height: 1.6;">Thank you for registering as a blood donor in our network. Your decision to join can save lives.</p>
+                        <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 16px; margin: 20px 0;">
+                            <p style="margin: 0; color: #34d399; font-weight: bold;">✅ Your profile is now active</p>
+                            <p style="margin: 8px 0 0; color: #94a3b8; font-size: 14px;">When someone within 15km of your location needs your blood group, you will receive an urgent email notification with an ACCEPT button.</p>
+                        </div>
+                        <p style="color: #64748b; font-size: 13px; margin-top: 30px;">Best Regards,<br><strong style="color: #34d399;">LifeSave Team</strong></p>
+                    </div>
+                </div>
+            `;
+
+            supabaseClient.rpc('send_donor_email', {
+                p_to_email: data.email.toLowerCase().trim(),
+                p_subject: 'Welcome to the LifeSave Network!',
+                p_html_content: htmlContent
+            }).then(({ error }) => {
+                if (error) console.error('Welcome email error:', error.message);
+                else console.log('✅ Welcome email sent via pg_net');
+            }).catch(err => console.error('RPC Function error:', err.message));
 
             // 4. Success message (always shown if Supabase insert worked)
             showMessage('Registration Successful! You are now part of the LIFESAVE network.', 'success');

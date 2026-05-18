@@ -150,12 +150,47 @@
                 location: `POINT(${coords[0]} ${coords[1]})`
             });
 
-            // 3. Attempt to trigger donor emails via Backend API (Optional)
-            fetch(`${LIFESAVE_CONFIG.API_URL}/api/request-blood`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            }).catch(err => console.log('Backend not reached for email broadcast.'));
+            // 3. Send notification emails to each donor via pg_net RPC
+            const baseAcceptUrl = `${window.location.origin}${window.location.pathname.replace(/\\/[^/]*$/, '')}/accept.html`;
+            const cleanEmail = (data.email || '').toLowerCase().trim();
+
+            donors.forEach(donor => {
+                const acceptUrl = `${baseAcceptUrl}?donorId=${donor.id}&reqName=${encodeURIComponent(data.name)}&reqMobile=${data.mobile}&reqLat=${coords[1]}&reqLng=${coords[0]}&reqEmail=${encodeURIComponent(cleanEmail)}`;
+
+                const htmlContent = `
+                    <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0a1628; border-radius: 16px; overflow: hidden;">
+                        <div style="background: linear-gradient(135deg, #ef4444, #dc2626); padding: 30px; text-align: center;">
+                            <h1 style="color: white; margin: 0; font-size: 28px;">🚨 Emergency Blood Request</h1>
+                            <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">Someone nearby needs your help!</p>
+                        </div>
+                        <div style="padding: 30px; color: #e2e8f0;">
+                            <h2 style="color: #f87171; margin-top: 0;">Hello ${donor.name},</h2>
+                            <p style="line-height: 1.6;">A patient near your location urgently needs <strong style="color: #f87171;">${data.bloodGroup}</strong> blood.</p>
+                            <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 16px; margin: 20px 0;">
+                                <p style="margin: 0 0 8px;"><strong style="color: #fca5a5;">Patient:</strong> <span style="color: #e2e8f0;">${data.name}</span></p>
+                                <p style="margin: 0 0 8px;"><strong style="color: #fca5a5;">Blood Group:</strong> <span style="color: #e2e8f0;">${data.bloodGroup}</span></p>
+                                <p style="margin: 0;"><strong style="color: #fca5a5;">Location:</strong> <span style="color: #e2e8f0;">${data.village}</span></p>
+                            </div>
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="${acceptUrl}" 
+                                   style="display: inline-block; background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 16px 40px; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 16px; letter-spacing: 1px;">
+                                  ✅ ACCEPT & VIEW LOCATION
+                                </a>
+                            </div>
+                            <p style="color: #64748b; font-size: 12px; text-align: center;">If you have donated in the last 90 days, please ignore this email.</p>
+                        </div>
+                    </div>
+                `;
+
+                supabaseClient.rpc('send_donor_email', {
+                    p_to_email: donor.email,
+                    p_subject: `🚨 URGENT: ${data.bloodGroup} Blood Needed in ${data.village}!`,
+                    p_html_content: htmlContent
+                }).then(({ error }) => {
+                    if (error) console.error(`Email error for ${donor.email}:`, error.message);
+                    else console.log(`✅ Notification sent to ${donor.email} via pg_net`);
+                }).catch(err => console.error(`RPC Function error for ${donor.email}:`, err.message));
+            });
 
             // 4. Setup Realtime listener for responses
             setupRealtimeListener();

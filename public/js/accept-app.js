@@ -40,18 +40,33 @@
             return;
         }
 
-        // 2. Optionally notify the requester via Edge Function
+        // 2. Optionally notify the requester via pg_net RPC
         try {
-            await supabaseClient.functions.invoke('notify-requester', {
-                body: {
-                    reqEmail,
-                    donorName: updatedDonor.name,
-                    donorMobile: updatedDonor.mobile
-                }
+            const htmlContent = `
+                <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0a1628; border-radius: 16px; overflow: hidden;">
+                    <div style="background: linear-gradient(135deg, #10b981, #059669); padding: 30px; text-align: center;">
+                        <h1 style="color: white; margin: 0; font-size: 28px;">🎉 Great News!</h1>
+                        <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0;">A donor has accepted your request</p>
+                    </div>
+                    <div style="padding: 30px; color: #e2e8f0;">
+                        <h2 style="color: #34d399; margin-top: 0;">A Donor is Coming!</h2>
+                        <p style="line-height: 1.6;">A volunteer blood donor has accepted your emergency blood request and is ready to help.</p>
+                        <div style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; padding: 16px; margin: 20px 0;">
+                        <p style="margin: 0 0 8px;"><strong style="color: #34d399;">Donor Name:</strong> <span style="color: #e2e8f0;">${updatedDonor.name}</span></p>
+                        <p style="margin: 0;"><strong style="color: #34d399;">Contact:</strong> <a href="tel:${updatedDonor.mobile}" style="color: #60a5fa; text-decoration: none;">${updatedDonor.mobile}</a></p>
+                        </div>
+                        <p style="line-height: 1.6; color: #fbbf24; font-weight: bold;">⚡ Please contact them immediately to coordinate.</p>
+                        <p style="color: #64748b; font-size: 13px; margin-top: 30px;">Best Regards,<br><strong style="color: #34d399;">LifeSave Team</strong></p>
+                    </div>
+                </div>
+            `;
+            await supabaseClient.rpc('send_donor_email', {
+                p_to_email: reqEmail,
+                p_subject: '🎉 A Donor is Coming — LifeSave Update',
+                p_html_content: htmlContent
             });
         } catch (fnError) {
-            // Edge Function not deployed — skip email notification
-            console.log('Edge Function not available — requester email skipped.');
+            console.log('RPC function not available — requester email skipped.', fnError);
         }
 
         // 3. Redirect to Map View with all params
